@@ -1,0 +1,42 @@
+{
+  "description": "Offline seed of public surveillance-ordinance metadata. The tracker reads this file locally and does not fetch the source URLs.",
+  "checked": "2026-11-06",
+  "ordinances": [
+    {
+      "jurisdiction": "Georgia",
+      "title": "Collection, storage, sharing, and destruction of captured license plate data for law enforcement purposes; penalty",
+      "citation": "O.C.G.A. § 35-1-22",
+      "instrument_type": "statute",
+      "status": "enacted",
+      "topic": "alpr",
+      "source_url": "https://law.justia.com/codes/georgia/title-35/chapter-1/section-35-1-22/",
+      "last_checked": "2026-11-06",
+      "summary": "Statewide rule for law-enforcement automated license plate readers. Enacted in 2018 by HB 79 and amended effective July 1, 2025 by SB 153. Access to captured plate data is limited to a law-enforcement purpose, the default destruction period is 30 months, agencies that deploy a system must keep use and training policies, and captured plate data is not an Open Records disclosure.",
+      "notes": "Section text checked against the public 2025 Code of Georgia page. This is a statute, not a city ordinance. Official compilation PDF: https://www.legis.ga.gov/api/document/docs/default-source/joint-features-document-library/t35-t36-ch1-59-(v27)-2025-pdf.pdf"
+    },
+    {
+      "jurisdiction": "Atlanta, GA",
+      "title": "Surveillance technology oversight and approval",
+      "citation": "26-O-1401",
+      "instrument_type": "ordinance",
+      "status": "held_in_committee",
+      "topic": "surveillance_oversight",
+      "source_url": "https://civicduty.app/local-body/atlanta-city-council/meetings/8a7980ff-20e4-45bf-9ce9-a47ab0909ea4/verdicts/8bf97f9a-de6d-40aa-a707-5b62ad1cc96e",
+      "last_checked": "2026-11-06",
+      "summary": "Proposed Atlanta ordinance to tier city surveillance tools, including license plate readers, and require impact reports, use policies, and council approval for higher-impact systems. Public reporting describes introduction in 2026 and a hold in committee; adoption was not shown in sources checked on this date.",
+      "notes": "Introduction also reported at https://www.11alive.com/article/news/community/atlanta-mayor-andre-dickens-surveillance-technology-legislation-flock-cameras/85-515486e0-e235-4225-8ac1-236d4f9c6448. Status is procedural, not an enacted code section."
+    },
+    {
+      "jurisdiction": "DeKalb County, GA",
+      "title": "Revised technical requirements for mandatory video surveillance systems at convenience stores",
+      "citation": "2024-0244",
+      "instrument_type": "ordinance",
+      "status": "adopted",
+      "topic": "video_surveillance",
+      "source_url": "https://library.municode.com/ga/dekalb_county/ordinances/code_of_ordinances?nodeId=2024",
+      "last_checked": "2026-11-06",
+      "summary": "Adopted February 14, 2024. Amends Chapter 15 of the DeKalb County code to revise technical requirements for mandatory video surveillance systems at convenience stores.",
+      "notes": "This ordinance covers cameras at private convenience stores. It does not regulate law-enforcement license plate readers."
+    }
+  ]
+}
