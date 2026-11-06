@@ -30,6 +30,9 @@ python ordinances/tracker.py list --status adopted
 
 # Receipt smoke test
 python core/receipts.py
+
+# Local dashboard (writes dashboard/index.html; no server required)
+python dashboard/build.py
 ```
 
 Acceptance tests (offline):
@@ -48,7 +51,8 @@ ju-civicwatch/
 ├── openrecords/automator.py  ORA request drafting + deadline tracking
 ├── ordinances/tracker.py   Local surveillance ordinance tracker
 ├── ordinances/data/seed.json Public metadata seed (no live fetch)
-├── dashboard/              (planned) Public transparency UI
+├── dashboard/build.py      Local HTML generator (no network)
+├── dashboard/index.html    Static page built from the seed snapshot
 └── tests/                  Acceptance tests
 ```
 
@@ -68,7 +72,7 @@ ju-civicwatch/
 - [x] UOF normalizer + demo
 - [x] Open Records automator + demo
 - [x] Ordinances tracker (local public-metadata seed)
-- [ ] Dashboard UI
+- [x] Dashboard UI (local static page)
 - [ ] Outreach to Bottoms transition team
 - [ ] Andre-to-Keisha draft finalized
 
@@ -89,6 +93,24 @@ python ordinances/tracker.py list --topic alpr
 ```
 
 Department policies (for example APD LPR standard operating procedures) are not ordinances and are not in this catalog. Refreshing a row means editing the local file after a manual check of the public source, then ingesting again.
+
+## Local dashboard
+
+`dashboard/build.py` writes a self-contained `dashboard/index.html` from files already on disk. It does not fetch source pages, call a paid API, or deploy.
+
+- Ordinances come from `ordinances/data/catalog.json` when that file exists, otherwise from `ordinances/data/seed.json`.
+- Flock and use-of-force sections use `flock/data/summary.json` or `uof/data/summary.json` when those files exist. Otherwise they show the offline synthetic demos and label them as demos.
+- Receipt JSON already in `receipts/` is listed. That directory is gitignored, so a fresh clone shows an empty receipts section until you run a module and rebuild.
+- Open-records drafts are not rendered. Outreach drafts stay with a person.
+
+The checked-in `dashboard/index.html` is the seed snapshot (no catalog, no receipt files). Rebuild after ingest if you want the page to follow `catalog.json`.
+
+```bash
+python dashboard/build.py
+# then open dashboard/index.html in a browser
+```
+
+`python dashboard/build.py` also writes a `DASHBOARD-BUILD` receipt with `cost_usd` 0. Pass `--no-receipt` to skip that file.
 
 ## License
 
