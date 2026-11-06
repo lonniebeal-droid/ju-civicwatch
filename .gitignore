@@ -1,0 +1,5 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+receipts/*.json
+ordinances/data/catalog.json

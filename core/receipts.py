@@ -52,7 +52,7 @@ def write_receipt(receipt: Receipt, directory: Optional[Path] = None) -> Path:
     """Persist a receipt as JSON. Returns the written path."""
     dest = directory or RECEIPTS_DIR
     dest.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     filename = f"{receipt.operation.lower().replace(' ', '-')}-{stamp}.json"
     path = dest / filename
     path.write_text(receipt.to_json(), encoding="utf-8")

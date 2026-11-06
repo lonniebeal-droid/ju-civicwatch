@@ -32,7 +32,7 @@ def test_receipt_roundtrip():
 
 def test_flock_demo_flags():
     result = flock_demo()
-    assert result.total_searches == 217
+    assert result.total_searches == 222
     assert result.flagged > 0
     codes = {f.code for f in result.flags}
     assert "AFTER_HOURS" in codes
@@ -73,6 +73,7 @@ def test_uof_normalize_apd_row():
 def test_ora_demo():
     out = ora_demo()
     assert "O.C.G.A." in out["draft_letter"]
+    assert "lonniebeal@gmail.com" in out["draft_letter"]
     assert out["tracker_summary"]["total"] == 1
     assert out["request"]["status"] == "SUBMITTED"
     assert out["request"]["deadline"] is not None
