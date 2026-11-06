@@ -9,6 +9,7 @@ Built for the Bottoms transition team and Dickens' office — but owned by the p
 - **Flock Audit Engine** (`flock/audit.py`) — flags after-hours searches, rapid-fire bursts, empty case numbers, repeat plates. Model: APD's Sept 2026 audit (115,578 searches, 79 flagged, 99.93% compliant).
 - **Use-of-Force Aggregator** (`uof/normalizer.py`) — normalizes UOF reports from APD, DeKalb, and any department into one canonical schema. Hashes officer IDs, never stores raw ones.
 - **Open Records Automator** (`openrecords/automator.py`) — drafts Georgia ORA requests (O.C.G.A. § 50-18-70), tracks 3-business-day deadlines, flags overdue.
+- **Surveillance Ordinance Tracker** (`ordinances/tracker.py`) — local catalog of public ordinance and statute metadata (jurisdiction, title, source URL, last checked). Reads a checked-in seed or a local JSON/CSV file. No network fetch.
 - **Receipt System** (`core/receipts.py`) — every data pull gets a SHA-256 verified receipt. Receipts or it didn't happen.
 
 ## Quick Start
@@ -23,8 +24,18 @@ python uof/normalizer.py
 # Open Records automator demo
 python openrecords/automator.py
 
+# Surveillance ordinance tracker (local seed; writes ordinances/data/catalog.json)
+python ordinances/tracker.py
+python ordinances/tracker.py list --status adopted
+
 # Receipt smoke test
 python core/receipts.py
+```
+
+Acceptance tests (offline):
+
+```bash
+python -m pytest tests/ -v
 ```
 
 ## Architecture
@@ -35,9 +46,10 @@ ju-civicwatch/
 ├── flock/audit.py          ALPR search flag engine
 ├── uof/normalizer.py       Use-of-force schema normalizer
 ├── openrecords/automator.py  ORA request drafting + deadline tracking
-├── ordinances/             (planned) Local surveillance ordinance tracker
+├── ordinances/tracker.py   Local surveillance ordinance tracker
+├── ordinances/data/seed.json Public metadata seed (no live fetch)
 ├── dashboard/              (planned) Public transparency UI
-└── tests/                  (planned) Acceptance tests
+└── tests/                  Acceptance tests
 ```
 
 ## Design Principles
@@ -55,10 +67,28 @@ ju-civicwatch/
 - [x] Flock audit engine + demo
 - [x] UOF normalizer + demo
 - [x] Open Records automator + demo
-- [ ] Ordinances tracker
+- [x] Ordinances tracker (local public-metadata seed)
 - [ ] Dashboard UI
 - [ ] Outreach to Bottoms transition team
 - [ ] Andre-to-Keisha draft finalized
+
+## Surveillance ordinance tracker
+
+`ordinances/tracker.py` keeps a local JSON catalog of public surveillance rules. The checked-in seed covers three public records as of 2026-11-06:
+
+- **Georgia, O.C.G.A. § 35-1-22** — statewide license-plate-data statute (enacted).
+- **Atlanta 26-O-1401** — proposed surveillance-technology oversight ordinance (held in committee; not adopted in the sources checked).
+- **DeKalb County 2024-0244** — adopted convenience-store video-surveillance ordinance (not an ALPR rule).
+
+Ingest does not download those pages. Drop a local `.json` or `.csv` export on disk and pass it to `ingest`. Each ingest writes a SHA-256 receipt with `cost_usd` 0. `ordinances/data/catalog.json` is generated and gitignored.
+
+```bash
+python ordinances/tracker.py ingest ordinances/data/seed.json
+python ordinances/tracker.py list --jurisdiction Atlanta
+python ordinances/tracker.py list --topic alpr
+```
+
+Department policies (for example APD LPR standard operating procedures) are not ordinances and are not in this catalog. Refreshing a row means editing the local file after a manual check of the public source, then ingesting again.
 
 ## License
 
