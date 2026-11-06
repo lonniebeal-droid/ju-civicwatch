@@ -38,7 +38,7 @@ class ORARequest:
         lines = [
             f"To: {self.agency}",
             f"Email: {self.contact_email}",
-            f"From: {self.requester_name} <{self.requester_email>}\n",
+            f"From: {self.requester_name} <{self.requester_email}>\n",
             f"Re: Open Records Request — {self.subject}\n",
             f"Submitted under {ORA_STATUTE}. Please provide the following records:",
         ]
@@ -77,7 +77,7 @@ class ORATracker:
                 if r.status == "SUBMITTED" and r.deadline and r.deadline < today]
 
     def summary(self) -> dict:
-        by_status: dict[str, int] = defaultdict_count = __import__("collections").defaultdict(int)
+        by_status: dict[str, int] = __import__("collections").defaultdict(int)
         for r in self.requests:
             by_status[r.status] += 1
         return {

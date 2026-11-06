@@ -96,7 +96,7 @@ def load_csv(path: Path, department: str) -> list[UOFRecord]:
 def aggregate(records: list[UOFRecord]) -> dict:
     """Roll up normalized records into summary stats."""
     total = len(records)
-    by_dept: dict[str, int] = defaultdict_count = __import__("collections").defaultdict(int)
+    by_dept: dict[str, int] = __import__("collections").defaultdict(int)
     by_force: dict[str, int] = __import__("collections").defaultdict(int)
     by_race: dict[str, int] = __import__("collections").defaultdict(int)
     injuries = 0
