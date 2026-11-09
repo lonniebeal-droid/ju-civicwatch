@@ -52,6 +52,31 @@ def test_flock_clean_dataset():
     assert result.compliance_pct == 100.0
 
 
+def test_flock_multi_flag_single_record():
+    """One record triggering two flags counts as ONE flagged search.
+
+    Regression test for the flock compliance bug: flagged must count unique
+    record indexes, not flag rows, or compliance_pct is understated.
+    """
+    from datetime import datetime
+
+    recs = [SearchRecord(
+        timestamp=datetime(2026, 9, 1, 10, i),
+        operator="OFF-001", plate=f"PLT{i}", case_number=f"CASE{i}",
+    ) for i in range(9)]
+    # After hours (02:30) AND no case number: two flags, one record.
+    recs.append(SearchRecord(
+        timestamp=datetime(2026, 9, 1, 2, 30),
+        operator="OFF-001", plate="PLT9", case_number="",
+    ))
+    result = audit(recs, department="MULTI-FLAG")
+    assert result.total_searches == 10
+    assert len(result.flags) == 2
+    assert {f.code for f in result.flags} == {"AFTER_HOURS", "NO_CASE"}
+    assert result.flagged == 1
+    assert result.compliance_pct == 90.0
+
+
 def test_uof_demo():
     out = uof_demo()
     assert out["summary"]["total_incidents"] == 5

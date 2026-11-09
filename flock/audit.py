@@ -136,7 +136,9 @@ def audit(records: list[SearchRecord], department: str = "UNKNOWN",
                                   f"Plate {plate} searched {len(idxs)}x on {day} by {op}", i))
 
     total = len(records)
-    flagged_count = len(flags)
+    # flagged counts UNIQUE records, not flag rows: one search triggering
+    # two flags (e.g. AFTER_HOURS + NO_CASE) is one flagged search.
+    flagged_count = len({fl.record_index for fl in flags})
     by_sev: dict[str, int] = defaultdict(int)
     by_code_count: dict[str, int] = defaultdict(int)
     for fl in flags:
