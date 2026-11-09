@@ -8,8 +8,10 @@ tracks deadlines, and logs every submission with a receipt.
 
 from __future__ import annotations
 
+import argparse
 import json
 import logging
+import os
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -22,6 +24,25 @@ logger = logging.getLogger(__name__)
 ORA_STATUTE = "O.C.G.A. § 50-18-70"
 RESPONSE_DAYS = 3  # business days
 
+# Requester identity: explicit argument > CIVICWATCH_REQUESTER_* env vars >
+# built-in defaults. No personal identity is read from anywhere else.
+ENV_REQUESTER_NAME = "CIVICWATCH_REQUESTER_NAME"
+ENV_REQUESTER_EMAIL = "CIVICWATCH_REQUESTER_EMAIL"
+DEFAULT_REQUESTER_NAME = "Lonnie Beal"
+DEFAULT_REQUESTER_EMAIL = "lonniebeal@gmail.com"
+
+
+def resolve_requester_name(explicit: Optional[str] = None) -> str:
+    if explicit:
+        return explicit
+    return os.environ.get(ENV_REQUESTER_NAME, DEFAULT_REQUESTER_NAME)
+
+
+def resolve_requester_email(explicit: Optional[str] = None) -> str:
+    if explicit:
+        return explicit
+    return os.environ.get(ENV_REQUESTER_EMAIL, DEFAULT_REQUESTER_EMAIL)
+
 
 @dataclass
 class ORARequest:
@@ -29,8 +50,8 @@ class ORARequest:
     contact_email: str
     subject: str
     records_requested: list[str]
-    requester_name: str = "Lonnie Beal"
-    requester_email: str = "lonniebeal@gmail.com"
+    requester_name: str = field(default_factory=resolve_requester_name)
+    requester_email: str = field(default_factory=resolve_requester_email)
     date_submitted: Optional[str] = None
     deadline: Optional[str] = None
     status: str = "DRAFT"  # DRAFT | SUBMITTED | EXTENDED | COMPLETE | DENIED
@@ -93,12 +114,15 @@ class ORATracker:
 
 # ---------- Demo ----------
 
-def demo() -> dict:
+def demo(requester_name: Optional[str] = None,
+         requester_email: Optional[str] = None) -> dict:
     tracker = ORATracker()
     req = ORARequest(
         agency="Atlanta Police Department — Open Records Unit",
         contact_email="apdopencrecords@atlantaga.gov",
         subject="Flock ALPR search logs — September 2026",
+        requester_name=resolve_requester_name(requester_name),
+        requester_email=resolve_requester_email(requester_email),
         records_requested=[
             "All Flock Safety ALPR search logs for September 1-30, 2026, including operator ID, timestamp, plate queried, case number, and location.",
             "Any internal audit or review of Flock searches conducted in September 2026.",
@@ -116,4 +140,12 @@ def demo() -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(demo(), indent=2))
+    parser = argparse.ArgumentParser(description="Draft a Georgia Open Records request")
+    parser.add_argument("--name", default=None,
+                        help="Requester name (overrides CIVICWATCH_REQUESTER_NAME)")
+    parser.add_argument("--email", default=None,
+                        help="Requester email (overrides CIVICWATCH_REQUESTER_EMAIL)")
+    args = parser.parse_args()
+    out = demo(requester_name=args.name, requester_email=args.email)
+    logger.info("ORA demo complete: requester=%s", out["request"]["requester_name"])
+    print(json.dumps(out, indent=2))
