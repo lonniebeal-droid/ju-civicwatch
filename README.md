@@ -73,6 +73,11 @@ ju-civicwatch/
 - [x] Open Records automator + demo
 - [x] Ordinances tracker (local public-metadata seed)
 - [x] Dashboard UI (local static page)
+- [x] Flock compliance counts unique flagged records (Card A, PR #3)
+- [x] ORA requester identity from env vars / CLI flags (Card C, PR #4)
+- [x] GitHub Pages deploy docs (Card D, PR #5)
+- [x] Hygiene: requirements-dev.txt, top-level imports, module logging (Card E, PR #6)
+- [ ] CI workflow (Card B — blocked: GitHub App lacks `workflows` permission)
 - [ ] Outreach to Bottoms transition team
 - [ ] Andre-to-Keisha draft finalized
 
