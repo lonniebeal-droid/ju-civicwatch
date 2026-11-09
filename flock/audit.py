@@ -16,11 +16,14 @@ from __future__ import annotations
 
 import csv
 import json
+import logging
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Optional
+
+logger = logging.getLogger(__name__)
 
 
 # Default thresholds (tune per department)
@@ -199,4 +202,7 @@ def demo() -> AuditResult:
 
 if __name__ == "__main__":
     result = demo()
+    # JSON stays on stdout (piping contract); the status line goes to the logger.
+    logger.info("flock demo complete: %s searches, %s flagged",
+                result.total_searches, result.flagged)
     print(json.dumps(result.to_dict(), indent=2, default=str))

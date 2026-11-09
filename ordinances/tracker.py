@@ -13,11 +13,14 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import logging
 import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
+
+logger = logging.getLogger(__name__)
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -274,6 +277,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     args = parser.parse_args(argv)
     if args.command is None:
+        logger.info("ordinance tracker demo complete")
         _print(demo())
         return 0
     if args.command == "ingest":

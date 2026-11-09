@@ -9,10 +9,14 @@ tracks deadlines, and logs every submission with a receipt.
 from __future__ import annotations
 
 import json
+import logging
+from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 ORA_STATUTE = "O.C.G.A. § 50-18-70"
@@ -77,7 +81,7 @@ class ORATracker:
                 if r.status == "SUBMITTED" and r.deadline and r.deadline < today]
 
     def summary(self) -> dict:
-        by_status: dict[str, int] = __import__("collections").defaultdict(int)
+        by_status: dict[str, int] = defaultdict(int)
         for r in self.requests:
             by_status[r.status] += 1
         return {
@@ -103,6 +107,7 @@ def demo() -> dict:
     )
     req.mark_submitted(date(2026, 11, 4))
     tracker.add(req)
+    logger.info("ORA demo complete: requester=%s", req.requester_name)
     return {
         "draft_letter": req.draft_letter(),
         "tracker_summary": tracker.summary(),
