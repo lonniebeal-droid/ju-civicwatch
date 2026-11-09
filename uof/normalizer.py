@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import csv
 import json
+from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -96,9 +97,9 @@ def load_csv(path: Path, department: str) -> list[UOFRecord]:
 def aggregate(records: list[UOFRecord]) -> dict:
     """Roll up normalized records into summary stats."""
     total = len(records)
-    by_dept: dict[str, int] = __import__("collections").defaultdict(int)
-    by_force: dict[str, int] = __import__("collections").defaultdict(int)
-    by_race: dict[str, int] = __import__("collections").defaultdict(int)
+    by_dept: dict[str, int] = defaultdict(int)
+    by_force: dict[str, int] = defaultdict(int)
+    by_race: dict[str, int] = defaultdict(int)
     injuries = 0
     weapons = 0
     for r in records:

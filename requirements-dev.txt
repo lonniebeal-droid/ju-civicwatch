@@ -1,0 +1,3 @@
+# JU CivicWatch — dev/test dependencies (CI installs this file).
+# Stdlib-only runtime; pytest is the only dev dependency.
+pytest>=8.0

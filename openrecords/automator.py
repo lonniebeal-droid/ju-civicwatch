@@ -131,6 +131,7 @@ def demo(requester_name: Optional[str] = None,
     )
     req.mark_submitted(date(2026, 11, 4))
     tracker.add(req)
+    logger.info("ORA demo complete: requester=%s", req.requester_name)
     return {
         "draft_letter": req.draft_letter(),
         "tracker_summary": tracker.summary(),
