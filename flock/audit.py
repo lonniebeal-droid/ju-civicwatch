@@ -93,9 +93,15 @@ def parse_csv(path: Path, *, ts_col: str = "timestamp", op_col: str = "operator"
 
 def audit(records: list[SearchRecord], department: str = "UNKNOWN",
           thresholds: Optional[dict] = None) -> AuditResult:
-    """Run the flag suite over a list of search records."""
+    """Run the flag suite over a list of search records.
+
+    Compliance is based on unique flagged *records*, not the raw count of Flag
+    objects. A single search that triggers multiple rules counts as one flagged
+    record toward the compliance percentage.
+    """
     t = {**DEFAULTS, **(thresholds or {})}
     flags: list[Flag] = []
+    flagged_indexes: set[int] = set()
 
     # Group helpers
     by_operator_time: dict[tuple[str, int], list[int]] = defaultdict(list)
@@ -107,11 +113,13 @@ def audit(records: list[SearchRecord], department: str = "UNKNOWN",
         if hour < t["after_hours_start"] or hour >= t["after_hours_end"]:
             flags.append(Flag("AFTER_HOURS", "MEDIUM",
                               f"Search at {rec.timestamp.strftime('%H:%M')} by {rec.operator}", i))
+            flagged_indexes.add(i)
 
         # NO_CASE
         if len(rec.case_number) < t["min_case_length"]:
             flags.append(Flag("NO_CASE", "HIGH",
                               f"Empty/placeholder case number by {rec.operator}", i))
+            flagged_indexes.add(i)
 
         # Rapid-fire bucketing (5-min windows)
         bucket = int(rec.timestamp.timestamp() // (t["rapid_fire_window_min"] * 60))
@@ -127,6 +135,7 @@ def audit(records: list[SearchRecord], department: str = "UNKNOWN",
             for i in idxs:
                 flags.append(Flag("RAPID_FIRE", "HIGH",
                                   f"{len(idxs)} searches in {t['rapid_fire_window_min']} min by {op}", i))
+                flagged_indexes.add(i)
 
     # REPEAT_PLATE
     for (op, plate, day), idxs in by_operator_plate_day.items():
@@ -134,9 +143,10 @@ def audit(records: list[SearchRecord], department: str = "UNKNOWN",
             for i in idxs:
                 flags.append(Flag("REPEAT_PLATE", "MEDIUM",
                                   f"Plate {plate} searched {len(idxs)}x on {day} by {op}", i))
+                flagged_indexes.add(i)
 
     total = len(records)
-    flagged_count = len(flags)
+    flagged_count = len(flagged_indexes)
     by_sev: dict[str, int] = defaultdict(int)
     by_code_count: dict[str, int] = defaultdict(int)
     for fl in flags:
