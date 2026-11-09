@@ -112,6 +112,29 @@ python dashboard/build.py
 
 `python dashboard/build.py` also writes a `DASHBOARD-BUILD` receipt with `cost_usd` 0. Pass `--no-receipt` to skip that file.
 
+## Deploy (GitHub Pages, $0)
+
+The dashboard is a static page — no server, no build step, no paid service. The $0 deploy path is GitHub Pages. This lane documents the taps only; it does not enable Pages (that is an account-level setting).
+
+**Owner taps (github.com, signed in as the repo owner):**
+
+1. Open the repo → **Settings** → **Pages** (left sidebar, under Code and automation).
+2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
+3. Set **Branch** to `main` and **Folder** to `/` (root). The checked-in `dashboard/index.html` is served at the site root. (Choosing `/dashboard` also works, but then the site root shows a directory listing instead of the dashboard.)
+4. Save. GitHub shows the published site URL on the same Pages settings page once the first deploy finishes (a few minutes).
+
+**Before publishing, rebuild the page from the latest main:**
+
+```bash
+python -m dashboard.build --out dashboard/index.html --no-receipt
+git add dashboard/index.html
+git commit -m "docs: rebuild dashboard snapshot"
+```
+
+The page lists whatever is in `receipts/` at build time (empty on a fresh clone = the seed snapshot). Rebuild after ingest if you want the page to follow `catalog.json` or show local receipts.
+
+**What is NOT verified yet:** no live Pages URL has been checked by any lane — the first publish needs the owner taps above, then a live fetch of the published URL. Netlify is the upgrade path only if forms or auth are added later; do not build a Netlify deploy first.
+
 ## License
 
 MIT — build it, use it, improve it. This belongs to Atlanta.
