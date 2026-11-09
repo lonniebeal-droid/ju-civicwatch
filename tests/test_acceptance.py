@@ -95,13 +95,31 @@ def test_uof_normalize_apd_row():
     assert rec.date == "2026-10-01"
 
 
-def test_ora_demo():
+def test_ora_demo(monkeypatch):
+    # Default identity applies only when no env override is set.
+    monkeypatch.delenv("CIVICWATCH_REQUESTER_NAME", raising=False)
+    monkeypatch.delenv("CIVICWATCH_REQUESTER_EMAIL", raising=False)
     out = ora_demo()
     assert "O.C.G.A." in out["draft_letter"]
     assert "lonniebeal@gmail.com" in out["draft_letter"]
     assert out["tracker_summary"]["total"] == 1
     assert out["request"]["status"] == "SUBMITTED"
     assert out["request"]["deadline"] is not None
+
+
+def test_ora_identity_env_override(monkeypatch):
+    monkeypatch.setenv("CIVICWATCH_REQUESTER_NAME", "Test Requester")
+    monkeypatch.setenv("CIVICWATCH_REQUESTER_EMAIL", "test@example.org")
+    out = ora_demo()
+    assert "Test Requester <test@example.org>" in out["draft_letter"]
+    assert "lonniebeal@gmail.com" not in out["draft_letter"]
+
+
+def test_ora_identity_explicit_arg_overrides_env(monkeypatch):
+    monkeypatch.setenv("CIVICWATCH_REQUESTER_NAME", "Env Name")
+    monkeypatch.setenv("CIVICWATCH_REQUESTER_EMAIL", "env@example.org")
+    out = ora_demo(requester_name="Arg Name", requester_email="arg@example.org")
+    assert "Arg Name <arg@example.org>" in out["draft_letter"]
 
 
 def test_ora_deadline_business_days():
