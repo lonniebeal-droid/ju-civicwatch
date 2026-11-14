@@ -77,9 +77,10 @@ ju-civicwatch/
 - [x] ORA requester identity from env vars / CLI flags (Card C, PR #4)
 - [x] GitHub Pages deploy docs (Card D, PR #5)
 - [x] Hygiene: requirements-dev.txt, top-level imports, module logging (Card E, PR #6)
-- [ ] CI workflow (Card B — blocked: GitHub App lacks `workflows` permission)
-- [ ] Outreach to Bottoms transition team
-- [ ] Andre-to-Keisha draft finalized
+- [x] CI workflow (Card B, `.github/workflows/ci.yml` on main `d24ce106` — pytest on push/PR/workflow_dispatch; first green run not yet observed from this lane)
+- [ ] Outreach to Bottoms transition team (owner)
+- [ ] Andre-to-Keisha draft finalized (owner)
+- [ ] GitHub Pages live URL (owner taps in Deploy section)
 
 ## Surveillance ordinance tracker
 
