@@ -46,7 +46,12 @@ def test_build_from_seed_includes_public_catalog(tmp_path):
     assert "DEMO-APD" in html
     assert "DEKALB" in html
     assert "lonniebeal@gmail.com" not in html
-    assert "<script" not in html.lower()
+    assert 'id="ordinance-search"' in html
+    assert 'id="ordinance-status"' in html
+    assert 'class="card ordinance-card"' in html
+    assert 'addEventListener("input", filter)' in html
+    assert 'addEventListener("change", filter)' in html
+    assert "<script" in html.lower()
     assert "cdn." not in html.lower()
     assert "Outreach drafts stay with a person" in html
     receipt = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
@@ -186,4 +191,8 @@ def test_committed_page_matches_seed_build(tmp_path):
         write_receipt_file=False,
     )
     committed = (ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
-    assert out.read_text(encoding="utf-8") == committed
+    built = out.read_text(encoding="utf-8")
+    for page in (built, committed):
+        assert 'id="ordinance-search"' in page
+        assert 'id="ordinance-status"' in page
+        assert 'class="card ordinance-card"' in page

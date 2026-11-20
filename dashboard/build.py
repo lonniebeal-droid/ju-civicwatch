@@ -238,8 +238,9 @@ def _render_ordinances(records: list[Ordinance], origin: str, source: str, seed_
                 "<details><summary>Notes</summary>"
                 f"<p>{esc(record.notes)}</p></details>"
             )
+        searchable = " ".join((record.jurisdiction, record.title, record.citation, record.instrument_type, record.status, record.topic, record.summary, record.notes)).lower()
         cards.append(
-            "<article class=\"card\">"
+            f"<article class=\"card ordinance-card\" data-status=\"{esc(record.status)}\" data-search=\"{esc(searchable)}\">"
             f"<p class=\"kicker\">{esc(record.jurisdiction)} · {esc(record.instrument_type)}</p>"
             f"<h3>{esc(record.title)}</h3>"
             f"{citation}"
@@ -254,11 +255,23 @@ def _render_ordinances(records: list[Ordinance], origin: str, source: str, seed_
             "</article>"
         )
     body = "".join(cards) if cards else "<p class=\"note\">No ordinance records in the local catalog.</p>"
+    statuses = sorted({record.status for record in records})
+    options = "".join(f"<option value=\"{esc(status)}\">{esc(status_label(status))}</option>" for status in statuses)
+    controls = (
+        '<div class="filters" role="search" aria-label="Filter ordinance records">'
+        '<label for="ordinance-search">Search records</label>'
+        '<input id="ordinance-search" type="search" placeholder="Search title, jurisdiction, citation…" autocomplete="off">'
+        '<label for="ordinance-status">Status</label>'
+        f'<select id="ordinance-status"><option value="">All statuses</option>{options}</select>'
+        '<p id="ordinance-results" class="note" aria-live="polite"></p>'
+        '</div>'
+    ) if records else ""
     return (
         "<section id=\"ordinances\">"
         "<h2>Surveillance ordinances</h2>"
         f"<p class=\"note\">{where}</p>"
         f"{seed_note}"
+        f"{controls}"
         f"{body}"
         "</section>"
     )
@@ -445,6 +458,20 @@ def render_page(
         f"{_render_flock(flock)}\n"
         f"{_render_uof(uof)}\n"
         f"{_render_receipts(receipts, receipts_dir)}\n"
+        '<script>'
+        '(() => { const search = document.getElementById("ordinance-search"); '
+        'const status = document.getElementById("ordinance-status"); '
+        'const cards = Array.from(document.querySelectorAll(".ordinance-card")); '
+        'const output = document.getElementById("ordinance-results"); '
+        'if (!search || !status || !output) return; '
+        'const filter = () => { const q = search.value.trim().toLowerCase(); '
+        'const selected = status.value; let shown = 0; '
+        'cards.forEach(card => { const match = (!q || card.dataset.search.includes(q)) '
+        '&& (!selected || card.dataset.status === selected); '
+        'card.hidden = !match; if (match) shown += 1; }); '
+        'output.textContent = "Showing " + shown + " of " + cards.length + " records"; }; '
+        'search.addEventListener("input", filter); status.addEventListener("change", filter); filter(); })();'
+        '</script>\n'
         '<footer class="colophon">\n'
         "<p>Outreach drafts stay with a person. This page does not send email or file a records request.</p>\n"
         "<p>JU CivicWatch · local dashboard · $0</p>\n"
