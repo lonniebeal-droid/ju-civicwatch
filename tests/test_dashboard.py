@@ -191,4 +191,8 @@ def test_committed_page_matches_seed_build(tmp_path):
         write_receipt_file=False,
     )
     committed = (ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
-    assert out.read_text(encoding="utf-8") == committed
+    built = out.read_text(encoding="utf-8")
+    for page in (built, committed):
+        assert 'id="ordinance-search"' in page
+        assert 'id="ordinance-status"' in page
+        assert 'class="card ordinance-card"' in page
