@@ -49,8 +49,8 @@ def test_build_from_seed_includes_public_catalog(tmp_path):
     assert 'id="ordinance-search"' in html
     assert 'id="ordinance-status"' in html
     assert 'class="card ordinance-card"' in html
-    assert "addEventListener(\\"input\\", filter)" in html
-    assert "addEventListener(\\"change\\", filter)" in html
+    assert 'addEventListener("input", filter)' in html
+    assert 'addEventListener("change", filter)' in html
     assert "<script" in html.lower()
     assert "cdn." not in html.lower()
     assert "Outreach drafts stay with a person" in html
