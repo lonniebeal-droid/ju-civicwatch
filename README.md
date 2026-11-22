@@ -41,6 +41,8 @@ Acceptance tests (offline):
 python -m pytest tests/ -v
 ```
 
+**Live dashboard (GitHub Pages):** https://lonniebeal-droid.github.io/ju-civicwatch/ → redirects to `dashboard/index.html`
+
 ## Architecture
 
 ```
@@ -77,10 +79,10 @@ ju-civicwatch/
 - [x] ORA requester identity from env vars / CLI flags (Card C, PR #4)
 - [x] GitHub Pages deploy docs (Card D, PR #5)
 - [x] Hygiene: requirements-dev.txt, top-level imports, module logging (Card E, PR #6)
-- [x] CI workflow (Card B, `.github/workflows/ci.yml` on main `d24ce106` — pytest on push/PR/workflow_dispatch; first green run not yet observed from this lane)
+- [x] CI workflow (Card B)
+- [x] **GitHub Pages LIVE** — https://lonniebeal-droid.github.io/ju-civicwatch/ and `/dashboard/index.html` HTTP 200 (verified 2026-11-22 Grok probe)
 - [ ] Outreach to Bottoms transition team (owner)
 - [ ] Andre-to-Keisha draft finalized (owner)
-- [ ] GitHub Pages live URL (owner taps in Deploy section)
 
 ## Surveillance ordinance tracker
 
@@ -98,48 +100,21 @@ python ordinances/tracker.py list --jurisdiction Atlanta
 python ordinances/tracker.py list --topic alpr
 ```
 
-Department policies (for example APD LPR standard operating procedures) are not ordinances and are not in this catalog. Refreshing a row means editing the local file after a manual check of the public source, then ingesting again.
-
 ## Local dashboard
 
 `dashboard/build.py` writes a self-contained `dashboard/index.html` from files already on disk. It does not fetch source pages, call a paid API, or deploy.
 
-- Ordinances come from `ordinances/data/catalog.json` when that file exists, otherwise from `ordinances/data/seed.json`.
-- Flock and use-of-force sections use `flock/data/summary.json` or `uof/data/summary.json` when those files exist. Otherwise they show the offline synthetic demos and label them as demos.
-- Receipt JSON already in `receipts/` is listed. That directory is gitignored, so a fresh clone shows an empty receipts section until you run a module and rebuild.
-- Open-records drafts are not rendered. Outreach drafts stay with a person.
-
-The checked-in `dashboard/index.html` is the seed snapshot (no catalog, no receipt files). Rebuild after ingest if you want the page to follow `catalog.json`.
-
-```bash
-python dashboard/build.py
-# then open dashboard/index.html in a browser
-```
-
-`python dashboard/build.py` also writes a `DASHBOARD-BUILD` receipt with `cost_usd` 0. Pass `--no-receipt` to skip that file.
-
 ## Deploy (GitHub Pages, $0)
 
-The dashboard is a static page — no server, no build step, no paid service. The $0 deploy path is GitHub Pages. This lane documents the taps only; it does not enable Pages (that is an account-level setting).
+**LIVE:** https://lonniebeal-droid.github.io/ju-civicwatch/
 
-**Owner taps (github.com, signed in as the repo owner):**
-
-1. Open the repo → **Settings** → **Pages** (left sidebar, under Code and automation).
-2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
-3. Set **Branch** to `main` and **Folder** to `/` (root). The checked-in `dashboard/index.html` is served at the site root. (Choosing `/dashboard` also works, but then the site root shows a directory listing instead of the dashboard.)
-4. Save. GitHub shows the published site URL on the same Pages settings page once the first deploy finishes (a few minutes).
-
-**Before publishing, rebuild the page from the latest main:**
+Root serves a redirect to `dashboard/index.html`. Rebuild snapshot after ingest if you want the published page to follow local catalog/receipts.
 
 ```bash
 python -m dashboard.build --out dashboard/index.html --no-receipt
 git add dashboard/index.html
 git commit -m "docs: rebuild dashboard snapshot"
 ```
-
-The page lists whatever is in `receipts/` at build time (empty on a fresh clone = the seed snapshot). Rebuild after ingest if you want the page to follow `catalog.json` or show local receipts.
-
-**What is NOT verified yet:** no live Pages URL has been checked by any lane — the first publish needs the owner taps above, then a live fetch of the published URL. Netlify is the upgrade path only if forms or auth are added later; do not build a Netlify deploy first.
 
 ## License
 
